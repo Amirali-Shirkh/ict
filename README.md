@@ -1,2 +1,2 @@
 # ict
-Infra as code
+Infrastructure As Code using Terraform for GCP

@@ -1,0 +1,1 @@
+This module is suppposed to provide a thin wrapper for a single resource, gcs bucket. This is a temporary module as it is not recommnded to have a module for a single resource. 

@@ -1,0 +1,16 @@
+---
+- hosts: mongoTest
+  become: true
+  become_user: root
+  tasks: 
+    - name: testing ansible with creating a text file
+      file:
+        path: /tmp/test1.txt
+        state: touch
+        mode: u+rw,g-wx,o-rwx
+    - name: testing ansible with tags
+      tags: [disk]
+      file:
+        path: /tmp/test2.txt
+        state: touch
+        mode: u+rw,g-wx,o-rwx

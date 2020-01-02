@@ -2,6 +2,8 @@
 Infrastructure As Code using Terraform for GCP
 
 ## Geting started
+This will create a simple VM using GCP and sets up a simple configuration using Ansible.
+
 How to run: 
 
 1. Export Google access credentials

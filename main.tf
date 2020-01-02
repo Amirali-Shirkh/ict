@@ -6,37 +6,55 @@ provider "google" {
   zone    = var.zone
 }
 
-module "backend-storage" {
-  source = "./gcs-backend"
+// setting up a gcs storage for backend
+# module "backend-storage" {
+#   source = "./gcs-backend"
+# }
+
+resource "google_compute_disk" "disk" {
+  name  = "my-disk"
+  type  = "pd-ssd"
+  zone  = "us-central1-a"
+  image = "centos-7-v20191014"
+  labels = {
+    environment = "dev"
+  }
+  physical_block_size_bytes = 4096
+
+  size = 40
 }
 
-# resource "google_compute_network" "vpc_network" {
-#   name = "terraform-network"
-# }
 
-# resource "google_compute_instance" "vm_instance" {
-#   name         = "terraform-instance"
-#   machine_type = var.machine_types[var.environment]
-#   tags         = ["web", "dev"]
+// setting up google instance
+resource "google_compute_instance" "mongoo" {
+  name         = "mongo-vm-test"
+  machine_type = "f1-micro"
+  zone         = "us-central1-a"
+  hostname = "mongo.vm.test"
 
-#     provisioner "local-exec" {
-#     command = "echo ${google_compute_instance.vm_instance.name}:  ${google_compute_instance.vm_instance.network_interface[0].access_config[0].nat_ip} >> ip_address.txt"
-#   }
+  boot_disk {
+    initialize_params {
+      image = "centos-7-v20191014"
+    }
+  }
 
-#   boot_disk {
-#     initialize_params {
-#       image = "cos-cloud/cos-stable"
-#     }
-#   }
+  metadata = {
+   ssh-keys = "amirali:${file("~/.ssh/id_rsa.pub")}"
+ }
 
-#   network_interface {
-#     network = google_compute_network.vpc_network.self_link
-#     access_config {
-#       nat_ip = google_compute_address.vm_static_ip.address
-#     }
-#   }
-# }
+  
+  attached_disk{
+    source = google_compute_disk.disk.self_link
+  }
 
-# resource "google_compute_address" "vm_static_ip" {
-#   name = "terraform-static-ip"
-# }
+  network_interface {
+    network = "default"
+
+    access_config {
+      // Ephemeral IP
+    }
+  }
+
+  metadata_startup_script = "echo hi > /test.txt"
+
+}

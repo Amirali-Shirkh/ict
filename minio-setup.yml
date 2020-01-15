@@ -1,0 +1,31 @@
+---
+- hosts: mongoTest
+  become: true
+  become_user: root
+  tasks: 
+    - name: create directory
+      file:
+        path: /usr/local/minio
+        state: directory
+
+    - name: installing minio client
+      get_url:
+        url: https://dl.min.io/client/mc/release/linux-amd64/mc
+        dest: /usr/local/minio/mc
+
+    - name: changing mc file permission
+      command: chmod +x /usr/local/minio/mc
+
+    - name: executing minio
+      command: /usr/local/minio/mc --help
+
+    - name: adding a cloud storage service
+      command: /usr/local/minio/mc  config host add gcs  https://storage.googleapis.com  {{access-key}} {{secret-key}}
+
+    - name: create a text file
+      file: 
+        state: touch
+        path: /usr/local/minio/test.txt
+
+    - name: copy a text file to my bucket
+      command: /usr/local/minio/mc cp /usr/local/minio/test.txt gcs/backup-storage-minio/
